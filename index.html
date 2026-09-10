@@ -15,7 +15,7 @@
     .hidden { display: none; }
     .pdf-box { background: #f8f9fa; border: 1px solid #e9ecef; padding: 15px; border-radius: 6px; margin-bottom: 15px; }
     .pdf-download { margin-bottom: 10px; font-size: 14px; }
-    .pdf-download a { color: #0066cc; text-decoration: underline; font-weight: bold; }
+    .pdf-download a { color: #0066cc; text-decoration: underline; font-weight: bold; cursor: pointer; }
     .agree-box { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 6px; margin-bottom: 25px; }
     .agree-box label { font-weight: bold; color: #856404; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 15px; }
     .agree-box input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
@@ -49,14 +49,13 @@
     <input type="text" id="location" name="location">
   </div>
 
-  <!-- 提出書類（PDF）セクション -->
   <div id="section-pdf-files" class="hidden">
     <h3>提出書類（PDF）</h3>
     
     <div class="pdf-box">
       <div class="pdf-download">
         📄 <strong>業務同意・申込書.pdf</strong><br>
-        <a href="https://drive.google.com/file/d/16J6Bkz4Bn_buhUMT4ia5PGUCSUKSzUPi/view?usp=sharing" target="_blank" rel="noopener">別タブで表示して確認・記入する</a>
+        <a onclick="openPdf('doc'); return false;">別タブで表示して確認・記入する</a>
       </div>
       <label>記入済みのものを添付してください</label>
       <input type="file" id="file_doc" accept=".pdf">
@@ -65,7 +64,7 @@
     <div class="pdf-box">
       <div class="pdf-download">
         📄 <strong>業務委託に伴う秘密保持誓約書.pdf</strong><br>
-        <a href="https://drive.google.com/file/d/1iMbBASj90Gv42FsjLZJL9bl404Fn7rSY/view?usp=sharing" target="_blank" rel="noopener">別タブで表示して確認・記入する</a>
+        <a onclick="openPdf('secret'); return false;">別タブで表示して確認・記入する</a>
       </div>
       <label>記入済みのものを添付してください</label>
       <input type="file" id="file_secret" accept=".pdf">
@@ -74,7 +73,7 @@
     <div class="pdf-box">
       <div class="pdf-download">
         📄 <strong>取引銀行口座登録依頼書.pdf</strong><br>
-        <a href="https://drive.google.com/file/d/1B7CkHabZ9vRvi7cRpJjFAnrEF6tootAc/view?usp=sharing" target="_blank" rel="noopener">別タブで表示して確認・記入する</a>
+        <a onclick="openPdf('bank'); return false;">別タブで表示して確認・記入する</a>
       </div>
       <label>記入済みのものを添付してください</label>
       <input type="file" id="file_bank" accept=".pdf">
@@ -83,17 +82,16 @@
     <div class="pdf-box">
       <div class="pdf-download">
         📄 <strong>貸与メールアドレス誓約書.pdf</strong><br>
-        <a href="https://drive.google.com/file/d/1QFcschIIIk3x1m0hzqIKRJGh2uUPgu7u/view?usp=sharing" target="_blank" rel="noopener">別タブで表示して確認・記入する</a>
+        <a onclick="openPdf('email'); return false;">別タブで表示して確認・記入する</a>
       </div>
       <label>記入済みのものを添付してください</label>
       <input type="file" id="file_email" accept=".pdf">
     </div>
 
-    <!-- 規約表示および同意チェックボックス -->
     <div class="pdf-box agree-box">
       <div class="pdf-download">
         📄 <strong>規約・重要事項説明書.pdf</strong><br>
-        <a href="https://drive.google.com/file/d/1uMiBFw_y91R0uVJZx6VpMyMb5Q43SiYR/view?usp=sharing" target="_blank" rel="noopener">別タブで規約を表示して確認する</a>
+        <a onclick="openPdf('agree'); return false;">別タブで規約を表示して確認する</a>
       </div>
       <div style="margin-top: 15px;">
         <label>
@@ -104,7 +102,6 @@
     </div>
   </div>
 
-  <!-- 技術員情報セクション -->
   <div id="section-workers" class="hidden">
     <h3 id="worker-section-title">ACN技術員情報</h3>
     <div id="worker-list"></div>
@@ -122,6 +119,20 @@
   let currentType = '';
   let workerCount = 0;
   const MAX_WORKERS = 10;
+
+  async function openPdf(fileKey) {
+    try {
+      const response = await fetch(`${GAS_URL}?fileKey=${fileKey}`);
+      const data = await response.json();
+      if (data.url) {
+        window.open(data.url, '_blank', 'noopener,noreferrer');
+      } else {
+        alert('ファイルの取得に失敗しました。');
+      }
+    } catch (error) {
+      alert('通信エラーが発生しました。');
+    }
+  }
 
   function switchType(type) {
     currentType = type;
