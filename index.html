@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>作業員登録・変更フォーム</title>
+  <style>
+    body { font-family: sans-serif; max-width: 700px; margin: 20px auto; padding: 0 15px; color: #333; line-height: 1.6; }
+    .form-group { margin-bottom: 20px; }
+    label { font-weight: bold; display: block; margin-bottom: 5px; }
+    input[type="text"], input[type="email"], input[type="tel"] {
+      width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px;
+    }
+    .radio-group label { font-weight: normal; margin-right: 15px; cursor: pointer; }
+    .hidden { display: none; }
+    .pdf-box { background: #f8f9fa; border: 1px solid #e9ecef; padding: 15px; border-radius: 6px; margin-bottom: 15px; }
+    .pdf-download { margin-bottom: 10px; font-size: 14px; }
+    .pdf-download a { color: #0066cc; text-decoration: underline; font-weight: bold; }
+    .agree-box { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 6px; margin-bottom: 25px; }
+    .agree-box label { font-weight: bold; color: #856404; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 15px; }
+    .agree-box input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+    .worker-card { border: 1px solid #ddd; padding: 15px; border-radius: 6px; margin-bottom: 15px; background: #fff; position: relative; }
+    .worker-title { font-weight: bold; font-size: 16px; margin-bottom: 10px; border-bottom: 2px solid #0066cc; padding-bottom: 5px; color: #0066cc; }
+    .btn-add { background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; margin-bottom: 20px; }
+    .btn-remove { background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; float: right; }
+    button[type="submit"] {
+      background-color: #0066cc; color: #fff; border: none; padding: 14px 24px; font-size: 16px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold;
+    }
+    button[type="submit"]:hover { background-color: #0052a3; }
+    #statusMessage { margin-top: 15px; font-weight: bold; text-align: center; word-break: break-all; }
+  </style>
+</head>
+<body>
+
+<h2>作業員登録・変更フォーム</h2>
+
+<form id="gasForm">
+  <div class="form-group">
+    <label>手続きの種類を選んでください <span style="color:red;">*</span></label>
+    <div class="radio-group">
+      <label><input type="radio" name="type" value="新規" required onclick="switchType('新規')"> A 新規</label>
+      <label><input type="radio" name="type" value="追加" onclick="switchType('追加')"> B 追加</label>
+      <label><input type="radio" name="type" value="削除" onclick="switchType('削除')"> C 削除</label>
+    </div>
+  </div>
+
+  <div id="section-location" class="form-group hidden">
+    <label for="location">拠点名 <span style="color:red;">*</span></label>
+    <input type="text" id="location" name="location">
+  </div>
+
+  <!-- 提出書類（PDF）セクション -->
+  <div id="section-pdf-files" class="hidden">
+    <h3>提出書類（PDF）</h3>
+    
+    <div class="pdf-box">
+      <div class="pdf-download">
+        📄 <strong>業務同意・申込書.pdf</strong><br>
+        <a href="https://drive.google.com/file/d/16J6Bkz4Bn_buhUMT4ia5PGUCSUKSzUPi/view?usp=sharing" target="_blank" rel="noopener">別タブで表示して確認・記入する</a>
+      </div>
+      <label>記入済みのものを添付してください</label>
+      <input type="file" id="file_doc" accept=".pdf">
+    </div>
+
+    <div class="pdf-box">
+      <div class="pdf-download">
+        📄 <strong>業務委託に伴う秘密保持誓約書.pdf</strong><br>
+        <a href="https://drive.google.com/file/d/1iMbBASj90Gv42FsjLZJL9bl404Fn7rSY/view?usp=sharing" target="_blank" rel="noopener">別タブで表示して確認・記入する</a>
+      </div>
+      <label>記入済みのものを添付してください</label>
+      <input type="file" id="file_secret" accept=".pdf">
+    </div>
+
+    <div class="pdf-box">
+      <div class="pdf-download">
+        📄 <strong>取引銀行口座登録依頼書.pdf</strong><br>
+        <a href="https://drive.google.com/file/d/1B7CkHabZ9vRvi7cRpJjFAnrEF6tootAc/view?usp=sharing" target="_blank" rel="noopener">別タブで表示して確認・記入する</a>
+      </div>
+      <label>記入済みのものを添付してください</label>
+      <input type="file" id="file_bank" accept=".pdf">
+    </div>
+
+    <div class="pdf-box">
+      <div class="pdf-download">
+        📄 <strong>貸与メールアドレス誓約書.pdf</strong><br>
+        <a href="https://drive.google.com/file/d/1QFcschIIIk3x1m0hzqIKRJGh2uUPgu7u/view?usp=sharing" target="_blank" rel="noopener">別タブで表示して確認・記入する</a>
+      </div>
+      <label>記入済みのものを添付してください</label>
+      <input type="file" id="file_email" accept=".pdf">
+    </div>
+
+    <!-- 規約表示および同意チェックボックス -->
+    <div class="pdf-box agree-box">
+      <div class="pdf-download">
+        📄 <strong>規約・重要事項説明書.pdf</strong><br>
+        <a href="https://drive.google.com/file/d/1uMiBFw_y91R0uVJZx6VpMyMb5Q43SiYR/view?usp=sharing" target="_blank" rel="noopener">別タブで規約を表示して確認する</a>
+      </div>
+      <div style="margin-top: 15px;">
+        <label>
+          <input type="checkbox" id="chk_agree" name="agree">
+          上記規約・重要事項等の内容を確認し、同意します <span style="color:red;">*</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- 技術員情報セクション -->
+  <div id="section-workers" class="hidden">
+    <h3 id="worker-section-title">ACN技術員情報</h3>
+    <div id="worker-list"></div>
+    <button type="button" class="btn-add" id="btn-add-worker" onclick="addWorkerCard()">＋ 作業員を追加する（最大10名）</button>
+  </div>
+
+  <button type="submit" id="btn-submit" class="hidden">送信する</button>
+</form>
+
+<div id="statusMessage"></div>
+
+<script>
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbxTjdsXiv-iCuxLzP91-FCax3c8PN5e-Tc2FlA_IWA3WBrhPDFjSRmOtddTX-FDz_q9/exec';
+
+  let currentType = '';
+  let workerCount = 0;
+  const MAX_WORKERS = 10;
+
+  function switchType(type) {
+    currentType = type;
+    document.getElementById('section-pdf-files').classList.add('hidden');
+    document.getElementById('section-location').classList.add('hidden');
+    document.getElementById('section-workers').classList.remove('hidden');
+    document.getElementById('btn-submit').classList.remove('hidden');
+
+    const agreeChk = document.getElementById('chk_agree');
+    if (agreeChk) {
+      agreeChk.required = (type === '新規');
+      agreeChk.checked = false;
+    }
+
+    document.getElementById('worker-list').innerHTML = '';
+    workerCount = 0;
+
+    if (type === '新規') {
+      document.getElementById('section-pdf-files').classList.remove('hidden');
+      document.getElementById('worker-section-title').textContent = 'ACN技術員登録申請書';
+    } else if (type === '追加') {
+      document.getElementById('section-location').classList.remove('hidden');
+      document.getElementById('worker-section-title').textContent = 'ACN技術員登録申請書';
+    } else if (type === '削除') {
+      document.getElementById('section-location').classList.remove('hidden');
+      document.getElementById('worker-section-title').textContent = 'ACN技術員削除申請書';
+    }
+
+    addWorkerCard();
+  }
+
+  function addWorkerCard() {
+    if (workerCount >= MAX_WORKERS) {
+      alert('最大10名までしか追加できません。');
+      return;
+    }
+
+    workerCount++;
+    const container = document.getElementById('worker-list');
+    const card = document.createElement('div');
+    card.className = 'worker-card';
+    card.id = `worker-card-${workerCount}`;
+
+    const isDelete = (currentType === '削除');
+
+    let html = `
+      ${workerCount > 1 ? `<button type="button" class="btn-remove" onclick="removeWorkerCard(${workerCount})">削除</button>` : ''}
+      <div class="worker-title">作業員 ${workerCount}</div>
+      <div class="form-group">
+        <label>氏名 <span style="color:red;">*</span></label>
+        <input type="text" class="w-name" required>
+      </div>
+      <div class="form-group">
+        <label>氏名(カタカナ) <span style="color:red;">*</span></label>
+        <input type="text" class="w-kana" required>
+      </div>
+      <div class="form-group">
+        <label>携帯電話 <span style="color:red;">*</span></label>
+        <input type="tel" class="w-phone" required>
+      </div>
+    `;
+
+    if (!isDelete) {
+      html += `
+        <div class="form-group">
+          <label>外出先で受信可能なアドレス(スマホ可) <span style="color:red;">*</span></label>
+          <input type="email" class="w-email" required>
+        </div>
+      `;
+    }
+
+    html += `
+      <div class="form-group"><label>車両メーカー</label><input type="text" class="w-carMaker"></div>
+      <div class="form-group"><label>車種</label><input type="text" class="w-carModel"></div>
+      <div class="form-group"><label>車両ナンバー</label><input type="text" class="w-carNumber"></div>
+    `;
+
+    card.innerHTML = html;
+    container.appendChild(card);
+
+    if (workerCount >= MAX_WORKERS) {
+      document.getElementById('btn-add-worker').style.display = 'none';
+    }
+  }
+
+  function removeWorkerCard(id) {
+    const card = document.getElementById(`worker-card-${id}`);
+    if (card) {
+      card.remove();
+      workerCount--;
+      document.getElementById('btn-add-worker').style.display = 'block';
+    }
+  }
+
+  function fileToBase64(fileInputId) {
+    return new Promise((resolve) => {
+      const input = document.getElementById(fileInputId);
+      if (!input || !input.files || !input.files[0]) {
+        resolve(null);
+        return;
+      }
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Data = e.target.result.split(',')[1];
+        resolve({
+          name: file.name,
+          type: file.type,
+          base64: base64Data
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  document.getElementById('gasForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const statusDiv = document.getElementById('statusMessage');
+    statusDiv.style.color = 'blue';
+    statusDiv.textContent = 'データをアップロード中...';
+
+    const selectedType = document.querySelector('input[name="type"]:checked').value;
+    const locationVal = document.getElementById('location').value;
+
+    const workers = [];
+    const cards = document.querySelectorAll('.worker-card');
+    cards.forEach(card => {
+      workers.push({
+        name: card.querySelector('.w-name').value,
+        kana: card.querySelector('.w-kana').value,
+        phone: card.querySelector('.w-phone').value,
+        email: card.querySelector('.w-email') ? card.querySelector('.w-email').value : '',
+        carMaker: card.querySelector('.w-carMaker').value,
+        carModel: card.querySelector('.w-carModel').value,
+        carNumber: card.querySelector('.w-carNumber').value
+      });
+    });
+
+    const [fileDoc, fileSecret, fileBank, fileEmail] = await Promise.all([
+      fileToBase64('file_doc'),
+      fileToBase64('file_secret'),
+      fileToBase64('file_bank'),
+      fileToBase64('file_email')
+    ]);
+
+    const payload = {
+      type: selectedType,
+      location: locationVal,
+      workers: workers,
+      file_doc: fileDoc,
+      file_secret: fileSecret,
+      file_bank: fileBank,
+      file_email: fileEmail
+    };
+
+    try {
+      const response = await fetch(GAS_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (data.result === 'success') {
+        statusDiv.style.color = 'green';
+        statusDiv.textContent = '送信が完了しました！スプレッドシートとGoogleドライブをご確認ください。';
+        document.getElementById('gasForm').reset();
+        document.getElementById('worker-list').innerHTML = '';
+        switchType(selectedType);
+      } else {
+        statusDiv.style.color = 'red';
+        statusDiv.textContent = 'GASエラー: ' + (data.error || '不明なエラー');
+      }
+    } catch (error) {
+      statusDiv.style.color = 'red';
+      statusDiv.textContent = '通信エラーが発生しました: ' + error.message;
+    }
+  });
+</script>
+
+</body>
+</html>
