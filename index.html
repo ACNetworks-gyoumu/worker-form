@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>作業員申請・Action修正 総合フォーム</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       max-width: 760px;
@@ -17,537 +15,287 @@
       background-color: #f4f7f9;
       line-height: 1.6;
     }
-
-    .form-card-container {
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-      padding: 35px;
-      margin-bottom: 30px;
+    #auth-modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background-color: rgba(15, 23, 42, 0.85); z-index: 9999;
+      display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px);
     }
-
-    /* Header */
-    .form-header {
-      text-align: center;
-      border-bottom: 3px solid #0066cc;
-      padding-bottom: 18px;
-      margin-bottom: 28px;
+    .auth-modal-card {
+      background: #ffffff; padding: 35px 30px; border-radius: 12px;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center;
     }
-    .form-header h1 {
-      font-size: 24px;
-      color: #0066cc;
-      margin: 0 0 10px 0;
-      font-weight: 700;
+    .auth-modal-card h2 { margin-top: 0; color: #0066cc; font-size: 20px; margin-bottom: 10px; }
+    .auth-modal-card p { font-size: 13px; color: #64748b; margin-bottom: 20px; line-height: 1.5; }
+    .auth-input-group { margin-bottom: 20px; }
+    .auth-input-group input {
+      width: 100%; padding: 12px; font-size: 18px; letter-spacing: 2px;
+      text-align: center; border: 2px solid #cbd5e1; border-radius: 6px; outline: none;
     }
-    .form-header p {
-      margin: 0;
-      font-size: 14px;
-      color: #666;
+    .auth-input-group input:focus { border-color: #0066cc; box-shadow: 0 0 0 3px rgba(0,102,204,0.15); }
+    .auth-btn {
+      background-color: #0066cc; color: #fff; border: none; padding: 12px;
+      font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%;
     }
-
-    /* Selection Section */
-    .menu-box {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 22px;
-      margin-bottom: 28px;
+    .auth-btn:hover { background-color: #0052a3; }
+    .auth-error-msg { color: #ef4444; font-size: 13px; margin-top: 10px; font-weight: bold; display: none; }
+    .form-card-container { background: #ffffff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); padding: 35px; margin-bottom: 30px; }
+    .form-header { text-align: center; border-bottom: 3px solid #0066cc; padding-bottom: 18px; margin-bottom: 28px; }
+    .form-header h1 { font-size: 24px; color: #0066cc; margin: 0 0 10px 0; font-weight: 700; }
+    .form-header p { margin: 0; font-size: 14px; color: #666; }
+    .menu-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px; margin-bottom: 28px; }
+    .menu-title { font-size: 16px; font-weight: bold; color: #0066cc; margin-bottom: 14px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+    .radio-option-group { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+    .radio-card { border: 2px solid #cbd5e1; border-radius: 8px; padding: 14px 18px; background: #ffffff; cursor: pointer; transition: all 0.2s; }
+    .radio-card:hover, .radio-card.selected { background: #f0f7ff; border-color: #0066cc; }
+    .radio-card-header { display: flex; align-items: center; gap: 10px; }
+    .radio-card-header input[type="radio"] { width: 18px; height: 18px; cursor: pointer; accent-color: #0066cc; }
+    .radio-card-header label { margin: 0; cursor: pointer; font-size: 16px; font-weight: bold; color: #1e293b; }
+    .radio-desc { font-size: 13px; color: #64748b; margin-top: 6px; margin-left: 28px; line-height: 1.5; }
+    .form-group { margin-bottom: 20px; }
+    label { font-weight: bold; display: block; margin-bottom: 6px; color: #334155; font-size: 14px; }
+    input[type="text"], input[type="email"], input[type="tel"], input[type="date"], input[type="password"], select, textarea {
+      width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px;
     }
-    .menu-title {
-      font-size: 16px;
-      font-weight: bold;
-      color: #0066cc;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border-bottom: 2px solid #e2e8f0;
-      padding-bottom: 8px;
-    }
-
-    .radio-option-group {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: 12px;
-    }
-    .radio-card {
-      border: 2px solid #cbd5e1;
-      border-radius: 8px;
-      padding: 14px 18px;
-      background: #ffffff;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .radio-card:hover {
-      background: #f0f7ff;
-      border-color: #0066cc;
-    }
-    .radio-card.selected {
-      background: #f0f7ff;
-      border-color: #0066cc;
-      box-shadow: 0 0 0 1px #0066cc;
-    }
-    .radio-card-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .radio-card-header input[type="radio"] {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
-      accent-color: #0066cc;
-    }
-    .radio-card-header label {
-      margin: 0;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: bold;
-      color: #1e293b;
-    }
-    .radio-card.selected .radio-card-header label {
-      color: #0066cc;
-    }
-    .radio-desc {
-      font-size: 13px;
-      color: #64748b;
-      margin-top: 6px;
-      margin-left: 28px;
-      line-height: 1.5;
-    }
-
-    /* Form Fields */
-    .form-group {
-      margin-bottom: 20px;
-    }
-    label {
-      font-weight: bold;
-      display: block;
-      margin-bottom: 6px;
-      color: #334155;
-      font-size: 14px;
-    }
-    input[type="text"], input[type="email"], input[type="tel"], input[type="date"], select, textarea {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      box-sizing: border-box;
-      font-size: 14px;
-      transition: border-color 0.2s;
-    }
-    input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus, input[type="date"]:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: #0066cc;
-      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
-    }
-
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #0066cc; box-shadow: 0 0 0 3px rgba(0,102,204,0.1); }
     .hidden { display: none !important; }
-
-    /* PDF Attachments */
-    .pdf-box {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      padding: 16px;
-      border-radius: 8px;
-      margin-bottom: 16px;
-    }
-    .pdf-download {
-      margin-bottom: 10px;
-      font-size: 14px;
-    }
-    .pdf-download a {
-      color: #0066cc;
-      text-decoration: underline;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .agree-box {
-      background: #fffbebf5;
-      border: 1px solid #fde68a;
-      padding: 16px;
-      border-radius: 8px;
-      margin-bottom: 25px;
-    }
-    .agree-box label {
-      font-weight: bold;
-      color: #92400e;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 14px;
-    }
-    .agree-box input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
-      accent-color: #0066cc;
-    }
-
-    /* Multi File Upload Styling */
-    .file-input-row {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    .file-input-row input[type="file"] {
-      flex: 1;
-    }
-    .btn-remove-file {
-      background: #ef4444;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
-      white-space: nowrap;
-    }
-    .btn-remove-file:hover { background: #dc2626; }
-    .btn-add-file {
-      background: #10b981;
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: bold;
-      transition: background 0.2s;
-    }
-    .btn-add-file:hover { background: #059669; }
-
-    /* Worker Cards */
-    .worker-card {
-      border: 1px solid #e2e8f0;
-      padding: 18px;
-      border-radius: 8px;
-      margin-bottom: 16px;
-      background: #ffffff;
-      position: relative;
-    }
-    .worker-title {
-      font-weight: bold;
-      font-size: 15px;
-      margin-bottom: 14px;
-      border-bottom: 2px solid #0066cc;
-      padding-bottom: 6px;
-      color: #0066cc;
-    }
-    .btn-add {
-      background: #10b981;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: bold;
-      margin-bottom: 20px;
-      transition: background 0.2s;
-    }
-    .btn-add:hover { background: #059669; }
-    .btn-remove {
-      background: #ef4444;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
-      float: right;
-    }
-    .btn-remove:hover { background: #dc2626; }
-
-    /* Buttons */
-    button[type="submit"], .btn-primary {
-      background-color: #0066cc;
-      color: #fff;
-      border: none;
-      padding: 14px 24px;
-      font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      width: 100%;
-      font-weight: bold;
-      transition: background 0.2s;
-    }
-    button[type="submit"]:hover, .btn-primary:hover { background-color: #0052a3; }
+    .pdf-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 8px; margin-bottom: 16px; }
+    .pdf-download { margin-bottom: 10px; font-size: 14px; }
+    .pdf-download a { color: #0066cc; text-decoration: underline; font-weight: bold; cursor: pointer; }
+    .agree-box { background: #fffbebf5; border: 1px solid #fde68a; padding: 16px; border-radius: 8px; margin-bottom: 25px; }
+    .agree-box label { font-weight: bold; color: #92400e; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 14px; }
+    .sub-section-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 20px; margin-top: 20px; margin-bottom: 25px; }
+    .sub-section-title { font-size: 16px; font-weight: bold; color: #0066cc; margin-top: 0; margin-bottom: 16px; border-bottom: 2px solid #0066cc; padding-bottom: 6px; }
+    .file-input-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+    .file-input-row input[type="file"] { flex: 1; }
+    .btn-remove-file { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    .btn-add-file { background: #10b981; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; }
+    .worker-card { border: 1px solid #e2e8f0; padding: 18px; border-radius: 8px; margin-bottom: 16px; background: #ffffff; }
+    .worker-title { font-weight: bold; font-size: 15px; margin-bottom: 14px; border-bottom: 2px solid #0066cc; padding-bottom: 6px; color: #0066cc; }
+    .btn-add { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; margin-bottom: 20px; }
+    .btn-remove { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; float: right; }
+    button[type="submit"], .btn-primary { background-color: #0066cc; color: #fff; border: none; padding: 14px 24px; font-size: 16px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; }
     button[type="submit"]:disabled, .btn-primary:disabled { background-color: #cbd5e1; cursor: not-allowed; }
-
-    /* Progress bar */
-    .progress-container {
-      margin: 20px 0;
-      padding: 16px;
-      background: #f0f7ff;
-      border: 1px solid #b6d4fe;
-      border-radius: 8px;
-      text-align: center;
-    }
-    .progress-text {
-      font-size: 14px;
-      font-weight: bold;
-      color: #0066cc;
-      margin-bottom: 8px;
-    }
-    .progress-bar-bg {
-      width: 100%;
-      height: 18px;
-      background-color: #e2e8f0;
-      border-radius: 9px;
-      overflow: hidden;
-    }
-    .progress-bar-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #10b981, #0066cc);
-      border-radius: 9px;
-      transition: width 0.3s ease;
-    }
-
+    .btn-back { background: #64748b; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; margin-bottom: 20px; }
+    .progress-container { margin: 20px 0; padding: 16px; background: #f0f7ff; border: 1px solid #b6d4fe; border-radius: 8px; text-align: center; }
+    .progress-text { font-size: 14px; font-weight: bold; color: #0066cc; margin-bottom: 8px; }
+    .progress-bar-bg { width: 100%; height: 18px; background-color: #e2e8f0; border-radius: 9px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #10b981, #0066cc); border-radius: 9px; transition: width 0.3s ease; }
     #statusMessage { margin-top: 15px; font-weight: bold; text-align: center; word-break: break-all; }
-
-    /* Completion View */
-    .completion-card {
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-      padding: 35px;
-      border-top: 6px solid #0066cc;
-    }
-    .completion-header {
-      font-size: 22px;
-      font-weight: bold;
-      color: #0066cc;
-      margin-bottom: 15px;
-      text-align: center;
-    }
-    .step-box {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-    .step-title {
-      font-weight: bold;
-      font-size: 15px;
-      color: #1e293b;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .step-badge {
-      background: #0066cc;
-      color: white;
-      font-size: 12px;
-      padding: 3px 10px;
-      border-radius: 12px;
-    }
-    .btn-download-manual {
-      display: inline-block;
-      background: #10b981;
-      color: white;
-      padding: 10px 18px;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 14px;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-    .btn-download-manual:hover { background: #059669; }
-    .schedule-list { margin: 10px 0 0 0; padding-left: 20px; }
+    .completion-card { background: #ffffff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); padding: 35px; border-top: 6px solid #0066cc; }
+    .completion-header { font-size: 22px; font-weight: bold; color: #0066cc; margin-bottom: 15px; text-align: center; }
+    .step-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .step-title { font-weight: bold; font-size: 15px; color: #1e293b; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+    .step-badge { background: #0066cc; color: white; font-size: 12px; padding: 3px 10px; border-radius: 12px; }
+    .btn-download-manual { display: inline-block; background: #10b981; color: white; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; margin-top: 10px; cursor: pointer; }
+    .schedule-form-box { background: #f0f7ff; border: 1px solid #b6d4fe; border-radius: 8px; padding: 18px; margin-top: 15px; }
+    .schedule-list { margin: 10px 0 15px 0; padding-left: 20px; }
     .schedule-list li { margin-bottom: 6px; }
 
-    .schedule-form-box {
-      background: #f0f7ff;
-      border: 1px solid #b6d4fe;
-      border-radius: 8px;
-      padding: 18px;
-      margin-top: 15px;
+    /* 未入力項目の強調スタイル・アニメーション */
+    .is-invalid-error {
+      border: 2px solid #ef4444 !important;
+      background-color: #fef2f2 !important;
+      animation: shake 0.3s ease-in-out;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+      100% { transform: translateX(0); }
+    }
+    .field-error-msg {
+      color: #ef4444;
+      font-size: 12px;
+      font-weight: bold;
+      margin-top: 4px;
+      display: block;
     }
   </style>
 </head>
 <body>
 
-<!-- Main Application Form -->
+<div id="auth-modal-overlay">
+  <div class="auth-modal-card">
+    <h2>🔒 パスワード認証</h2>
+    <p>セキュリティ認証が必要です。</p>
+    <div class="auth-input-group">
+      <input type="password" id="authPassword" placeholder="password" maxlength="8" autocomplete="off" oninput="convertToHalfWidth(this)" onkeypress="handleAuthKeyPress(event)">
+    </div>
+    <button type="button" class="auth-btn" onclick="checkPassword()">認証して進む</button>
+    <div id="authErrorMsg" class="auth-error-msg">パスワードが正しくありません</div>
+  </div>
+</div>
+
 <div id="form-container" class="form-card-container">
-  
   <div class="form-header">
-    <h1>作業員申請・Action修正 総合フォーム</h1>
+    <h1>作業員申請・Action修正・報告書発注 総合フォーム</h1>
     <p>該当する申請種別を選択し、必要事項をご入力のうえ送信してください。</p>
   </div>
 
   <form id="gasForm" novalidate>
-    <!-- Menu / Selection Card -->
-    <div class="menu-box">
+    <div class="menu-box" id="section-menu">
       <div class="menu-title">📋 申請種別を選択してください</div>
-      
       <div class="radio-option-group">
-        <!-- 1. 新規 -->
         <div class="radio-card" id="card_type_new" onclick="selectRadio('type_new', '新規')">
           <div class="radio-card-header">
             <input type="radio" id="type_new" name="type" value="新規" onclick="switchType('新規')">
             <label for="type_new">1. 【新規】作業員登録手続き</label>
           </div>
-          <div class="radio-desc">
-            初めて作業員として登録される方向けの手続きです。<br>各種同意書・口座情報等の提出書類（PDF）の添付が必要です。
-          </div>
+          <div class="radio-desc">初めて作業員として登録される方向けの手続きです。</div>
         </div>
-
-        <!-- 2. 追加 -->
         <div class="radio-card" id="card_type_add" onclick="selectRadio('type_add', '追加')">
           <div class="radio-card-header">
             <input type="radio" id="type_add" name="type" value="追加" onclick="switchType('追加')">
             <label for="type_add">2. 【追加】作業員の追加申請</label>
           </div>
-          <div class="radio-desc">
-            すでに登録済みの拠点に、新しい作業員（スタッフ）を追加配置する場合の手続きです。
-          </div>
+          <div class="radio-desc">既存の拠点に作業員を追加配置する場合の手続きです。</div>
         </div>
-
-        <!-- 3. 削除 -->
         <div class="radio-card" id="card_type_del" onclick="selectRadio('type_del', '削除')">
           <div class="radio-card-header">
             <input type="radio" id="type_del" name="type" value="削除" onclick="switchType('削除')">
             <label for="type_del">3. 【削除】作業員の削除・解除申請</label>
           </div>
-          <div class="radio-desc">
-            退職や配置転換などに伴い、現在登録されている作業員の登録を解除・削除する手続きです。
-          </div>
+          <div class="radio-desc">作業員の登録を解除・削除する手続きです。</div>
         </div>
-
-        <!-- 4. Action修正 -->
         <div class="radio-card" id="card_type_fix" onclick="selectRadio('type_fix', 'Action修正')">
           <div class="radio-card-header">
             <input type="radio" id="type_fix" name="type" value="Action修正" onclick="switchType('Action修正')">
             <label for="type_fix">4. 【Action修正】申請内容の修正依頼</label>
           </div>
-          <div class="radio-desc">
-            拠点名や受付番号、店舗名を指定し、入力内容の不備や変更箇所を修正申請するための手続きです。
+          <div class="radio-desc">入力内容の不備や変更箇所を修正申請するための手続きです。</div>
+        </div>
+        <!-- 追加: 5. 報告書の発注申請 -->
+        <div class="radio-card" id="card_type_report" onclick="selectRadio('type_report', '報告書発注')">
+          <div class="radio-card-header">
+            <input type="radio" id="type_report" name="type" value="報告書発注" onclick="switchType('報告書発注')">
+            <label for="type_report">5. 【報告書発注】報告書の発注申請</label>
           </div>
+          <div class="radio-desc">AC報告書・AFS報告書の発注を行う手続きです。</div>
         </div>
       </div>
     </div>
 
-    <!-- Section A: Action修正 Forms -->
+    <!-- Section A: Action修正 -->
     <div id="section-action-fix" class="hidden">
+      <button type="button" class="btn-back" onclick="resetSelection()">← 申請種別選択に戻る</button>
       <h3 style="color: #0066cc; border-bottom: 2px solid #0066cc; padding-bottom: 6px; margin-bottom: 18px;">Action修正情報</h3>
-      
-      <!-- 1. 拠点名 -->
-      <div class="form-group">
-        <label for="fixLocation">拠点名 <span style="color:red;">*</span></label>
-        <input type="text" id="fixLocation" placeholder="例: AC木場">
-      </div>
-
-      <!-- 2. 受付番号 -->
-      <div class="form-group">
-        <label for="receiptNumber">受付番号 <span style="color:red;">*</span></label>
-        <input type="text" id="receiptNumber" placeholder="例: 12345" style="ime-mode: disabled;" oninput="convertToHalfWidth(this)">
-      </div>
-
-      <!-- 3. 店舗名 -->
-      <div class="form-group">
-        <label for="storeName">店舗名 <span style="color:red;">*</span></label>
-        <input type="text" id="storeName" placeholder="例: 東京店">
-      </div>
-
-      <!-- 4. 修正箇所 / 内容 -->
-      <div class="form-group">
-        <label for="fixDetails">修正箇所 / 内容 <span style="color:red;">*</span></label>
-        <textarea id="fixDetails" rows="4" placeholder="修正箇所の詳細をご記入ください"></textarea>
-      </div>
-
-      <!-- 5. PDFファイル添付 (複数) -->
+      <div class="form-group"><label for="fixLocation">拠点名 <span style="color:red;">*</span></label><input type="text" id="fixLocation" placeholder="例: AC木場"></div>
+      <div class="form-group"><label for="receiptNumber">受付番号 <span style="color:red;">*</span></label><input type="text" id="receiptNumber" placeholder="例: 12345" oninput="convertToHalfWidth(this)"></div>
+      <div class="form-group"><label for="storeName">店舗名 <span style="color:red;">*</span></label><input type="text" id="storeName" placeholder="例: 東京店"></div>
+      <div class="form-group"><label for="fixDetails">修正箇所 / 内容 <span style="color:red;">*</span></label><textarea id="fixDetails" rows="4"></textarea></div>
       <div class="form-group">
         <label>PDFファイル添付 (任意・最大5ファイル)</label>
-        <div id="fix-file-list">
-          <div class="file-input-row">
-            <input type="file" class="file-action-fix" accept=".pdf">
-          </div>
-        </div>
+        <div id="fix-file-list"><div class="file-input-row"><input type="file" class="file-action-fix" accept=".pdf"></div></div>
         <button type="button" class="btn-add-file" id="btn-add-fix-file" onclick="addFixFileInput()">＋ ファイルを追加</button>
       </div>
     </div>
 
-    <!-- Section B: Location (For 追加 / 削除) -->
+    <!-- Section E: 報告書発注（新規追加） -->
+    <div id="section-report-order" class="hidden">
+      <button type="button" class="btn-back" onclick="resetSelection()">← 申請種別選択に戻る</button>
+      <h3 style="color: #0066cc; border-bottom: 2px solid #0066cc; padding-bottom: 6px; margin-bottom: 18px;">報告書発注情報</h3>
+      <div class="form-group"><label for="reportLocation">拠点名 <span style="color:red;">*</span></label><input type="text" id="reportLocation" placeholder="例: AC木場"></div>
+      <div class="form-group"><label for="reportApplicantName">申請者氏名 <span style="color:red;">*</span></label><input type="text" id="reportApplicantName" placeholder="例: 山田 太郎"></div>
+      
+      <div class="sub-section-box">
+        <div class="sub-section-title">📄 発注報告書・数量選択</div>
+        <p style="font-size: 13px; color: #64748b; margin-top: -10px; margin-bottom: 15px;">※必要な報告書の数量（1〜5個）を選択してください。（少なくともいずれか1つを選択）</p>
+        
+        <div class="form-group">
+          <label for="acReportQty">AC報告書</label>
+          <select id="acReportQty" class="report-qty-select">
+            <option value="">選択なし（不要）</option>
+            <option value="1">1個</option>
+            <option value="2">2個</option>
+            <option value="3">3個</option>
+            <option value="4">4個</option>
+            <option value="5">5個</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="afsReportQty">AFS報告書</label>
+          <select id="afsReportQty" class="report-qty-select">
+            <option value="">選択なし（不要）</option>
+            <option value="1">1個</option>
+            <option value="2">2個</option>
+            <option value="3">3個</option>
+            <option value="4">4個</option>
+            <option value="5">5個</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section B: Location -->
     <div id="section-location" class="form-group hidden">
+      <button type="button" class="btn-back" onclick="resetSelection()">← 申請種別選択に戻る</button>
       <label for="location">拠点名 <span style="color:red;">*</span></label>
       <input type="text" id="location" name="location" placeholder="例: AC木場">
     </div>
 
-    <!-- Section C: PDF Documents (For 新規) -->
+    <!-- Section C: PDF Documents & Bank Registration -->
     <div id="section-pdf-files" class="hidden">
+      <button type="button" class="btn-back" onclick="resetSelection()">← 申請種別選択に戻る</button>
       <h3 style="color: #0066cc; border-bottom: 2px solid #0066cc; padding-bottom: 6px; margin-bottom: 18px;">提出書類（PDF）</h3>
-      
       <div class="pdf-box">
-        <div class="pdf-download">
-          📄 <strong>業務同意・申込書.pdf</strong><br>
-          <a onclick="openPdf('doc'); return false;">ダウンロードはこちらから</a>
-        </div>
+        <div class="pdf-download">📄 <strong>業務同意・申込書.pdf</strong><br><a onclick="openPdf('doc'); return false;">ダウンロードはこちら</a></div>
         <label for="file_doc">記入済みのものを添付してください <span style="color:red;">*</span></label>
         <input type="file" id="file_doc" class="req-file" accept=".pdf">
       </div>
-
       <div class="pdf-box">
-        <div class="pdf-download">
-          📄 <strong>業務委託に伴う秘密保持誓約書.pdf</strong><br>
-          <a onclick="openPdf('secret'); return false;">ダウンロードはこちらから</a>
-        </div>
+        <div class="pdf-download">📄 <strong>業務委託に伴う秘密保持誓約書.pdf</strong><br><a onclick="openPdf('secret'); return false;">ダウンロードはこちら</a></div>
         <label for="file_secret">記入済みのものを添付してください <span style="color:red;">*</span></label>
         <input type="file" id="file_secret" class="req-file" accept=".pdf">
       </div>
-
       <div class="pdf-box">
-        <div class="pdf-download">
-          📄 <strong>取引銀行口座登録依頼書.pdf</strong><br>
-          <a onclick="openPdf('bank'); return false;">ダウンロードはこちらから</a>
-        </div>
-        <label for="file_bank">記入済みのものを添付してください <span style="color:red;">*</span></label>
-        <input type="file" id="file_bank" class="req-file" accept=".pdf">
-      </div>
-
-      <div class="pdf-box">
-        <div class="pdf-download">
-          📄 <strong>貸与メールアドレス誓約書.pdf</strong><br>
-          <a onclick="openPdf('email'); return false;">ダウンロードはこちらから</a>
-        </div>
+        <div class="pdf-download">📄 <strong>貸与メールアドレス誓約書.pdf</strong><br><a onclick="openPdf('email'); return false;">ダウンロードはこちら</a></div>
         <label for="file_email">記入済みのものを添付してください <span style="color:red;">*</span></label>
         <input type="file" id="file_email" class="req-file" accept=".pdf">
       </div>
-
       <div class="pdf-box agree-box">
-        <div class="pdf-download">
-          📄 <strong>規約・重要事項説明書.pdf</strong><br>
-          <a onclick="openPdf('agree'); return false;">別タブで規約を表示して確認する</a>
-        </div>
+        <div class="pdf-download">📄 <strong>規約・重要事項説明書.pdf</strong><br><a onclick="openPdf('agree'); return false;">別タブで規約を表示して確認する</a></div>
         <div style="margin-top: 12px;">
-          <label>
-            <input type="checkbox" id="chk_agree" name="agree">
-            上記規約・重要事項等の内容を確認し、同意します <span style="color:red;">*</span>
-          </label>
+          <label><input type="checkbox" id="chk_agree" name="agree"> 上記規約・重要事項等の内容を確認し、同意します <span style="color:red;">*</span></label>
         </div>
+      </div>
+
+      <div class="sub-section-box">
+        <div class="sub-section-title">🏦 取引銀行口座登録情報</div>
+        <div class="form-group"><label for="invoiceCompanyName">請求書記入社名 <span style="color:red;">*</span></label><input type="text" id="invoiceCompanyName" class="req-bank-field" placeholder="例: 株式会社〇〇"></div>
+        <div class="form-group"><label for="invoiceDeptName">部署名</label><input type="text" id="invoiceDeptName" placeholder="例: 営業部"></div>
+        <div class="form-group"><label for="invoicePostalCode">郵便番号 <span style="color:red;">*</span></label><input type="text" id="invoicePostalCode" class="req-bank-field" placeholder="例: 123-4567" oninput="convertToHalfWidth(this)"></div>
+        <div class="form-group"><label for="invoiceAddress">住所 <span style="color:red;">*</span></label><input type="text" id="invoiceAddress" class="req-bank-field" placeholder="例: 東京都江東区〇〇 1-2-3"></div>
+        <div class="form-group"><label for="invoiceTel">電話番号 <span style="color:red;">*</span></label><input type="tel" id="invoiceTel" class="req-bank-field" placeholder="例: 03-1234-5678" oninput="convertToHalfWidth(this)"></div>
+        <div class="form-group"><label for="invoiceFax">FAX</label><input type="tel" id="invoiceFax" placeholder="例: 03-1234-5679" oninput="convertToHalfWidth(this)"></div>
+        <div class="form-group"><label for="file_invoice_seal">請求書印 <span style="color:red;">*</span></label><input type="file" id="file_invoice_seal" class="req-bank-file" accept="image/*,.pdf"></div>
+        <div class="form-group"><label for="bankName">銀行名 <span style="color:red;">*</span></label><input type="text" id="bankName" class="req-bank-field" placeholder="例: 三菱UFJ銀行"></div>
+        <div class="form-group"><label for="branchName">支店名 <span style="color:red;">*</span></label><input type="text" id="branchName" class="req-bank-field" placeholder="例: 本店営業部"></div>
+        <div class="form-group">
+          <label for="accountType">種別 <span style="color:red;">*</span></label>
+          <select id="accountType" class="req-bank-field">
+            <option value="">選択してください</option>
+            <option value="普通">普通</option>
+            <option value="定期">定期</option>
+          </select>
+        </div>
+        <div class="form-group"><label for="accountName">口座名義 <span style="color:red;">*</span></label><input type="text" id="accountName" class="req-bank-field" placeholder="例: カ) 〇〇サービス"></div>
+        <div class="form-group"><label for="accountNumber">口座番号 <span style="color:red;">*</span></label><input type="text" id="accountNumber" class="req-bank-field" placeholder="例: 1234567" oninput="convertToHalfWidth(this)"></div>
       </div>
     </div>
 
-    <!-- Section D: Worker Details (For 新規 / 追加 / 削除) -->
+    <!-- Section D: Worker Details -->
     <div id="section-workers" class="hidden">
       <h3 id="worker-section-title" style="color: #0066cc; border-bottom: 2px solid #0066cc; padding-bottom: 6px; margin-bottom: 18px;">ACN技術員情報</h3>
       <div id="worker-list"></div>
       <button type="button" class="btn-add" id="btn-add-worker" onclick="addWorkerCard()">＋ 作業員を追加する（最大10名）</button>
     </div>
 
-    <!-- Progress Gauge -->
     <div id="formProgress" class="progress-container hidden">
       <div id="formProgressText" class="progress-text">ファイルを読み込み中... (0%)</div>
-      <div class="progress-bar-bg">
-        <div id="formProgressBar" class="progress-bar-fill"></div>
-      </div>
+      <div class="progress-bar-bg"><div id="formProgressBar" class="progress-bar-fill"></div></div>
     </div>
 
     <button type="submit" id="btn-submit" class="hidden">送信する</button>
@@ -556,15 +304,13 @@
 
 <div id="statusMessage"></div>
 
-
-<!-- Completion Screen A: 追加 / 削除 / Action修正 -->
+<!-- Completion Screen A -->
 <div id="section-simple-completion" class="hidden">
   <div class="completion-card">
     <div class="completion-header">✅ 申請手続きが完了しました</div>
-    <p style="text-align: center; color: #475569;">ご申請いただきありがとうございます。<br>申請内容の確認および処理を進めさせていただきます。</p>
+    <p style="text-align: center; color: #475569;">ご申請いただきありがとうございます。</p>
   </div>
 </div>
-
 
 <!-- Completion Screen B: 新規 (Steps 1 to 5) -->
 <div id="section-completion" class="hidden">
@@ -602,7 +348,7 @@
       </ul>
 
       <!-- Schedule Request Form -->
-      <form id="scheduleForm" class="schedule-form-box">
+      <form id="scheduleForm" class="schedule-form-box" novalidate>
         <p style="font-weight: bold; margin-top: 0; color: #0066cc; font-size: 14px;">■ 概要説明（オンライン打合せ）の希望日程をご入力ください</p>
         
         <div class="form-group">
@@ -676,11 +422,47 @@
   const GAS_URL = 'https://script.google.com/macros/s/AKfycbxTjdsXiv-iCuxLzP91-FCax3c8PN5e-Tc2FlA_IWA3WBrhPDFjSRmOtddTX-FDz_q9/exec';
 
   let currentType = null;
+  let submittedApplicantName = '';
   let submittedApplicantEmail = '';
   const MAX_WORKERS = 10;
   const MAX_FIX_FILES = 5;
 
-  // 全角英数字・記号を自動的に半角へ変換する処理
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+      if (e.target.id === 'authPassword') return;
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  function getTodayJapanDateString() {
+    const now = new Date();
+    const jstDateStr = now.toLocaleDateString('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit' });
+    return jstDateStr.replace(/\//g, '');
+  }
+
+  function checkPassword() {
+    const inputPass = document.getElementById('authPassword').value.trim();
+    const correctPass = getTodayJapanDateString();
+    const errorMsg = document.getElementById('authErrorMsg');
+
+    if (inputPass === correctPass) {
+      document.getElementById('auth-modal-overlay').style.display = 'none';
+      errorMsg.style.display = 'none';
+    } else {
+      errorMsg.style.display = 'block';
+      document.getElementById('authPassword').value = '';
+      document.getElementById('authPassword').focus();
+    }
+  }
+
+  function handleAuthKeyPress(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      checkPassword();
+    }
+  }
+
   function convertToHalfWidth(inputElement) {
     let val = inputElement.value;
     val = val.replace(/[Ａ-Ｚａ-ｚ０-９]/g, function(s) {
@@ -713,19 +495,19 @@
 
   function switchType(type) {
     currentType = type;
-
-    // 送信ボタンを表示
+    clearErrors();
+    document.getElementById('section-menu').classList.add('hidden');
     document.getElementById('btn-submit').classList.remove('hidden');
 
-    // Update selection styling on cards
     document.querySelectorAll('.radio-card').forEach(card => card.classList.remove('selected'));
     if (type === '新規') document.getElementById('card_type_new').classList.add('selected');
     if (type === '追加') document.getElementById('card_type_add').classList.add('selected');
     if (type === '削除') document.getElementById('card_type_del').classList.add('selected');
     if (type === 'Action修正') document.getElementById('card_type_fix').classList.add('selected');
+    if (type === '報告書発注') document.getElementById('card_type_report').classList.add('selected');
 
-    // Section Visibilities
     const actionFixSec = document.getElementById('section-action-fix');
+    const reportOrderSec = document.getElementById('section-report-order');
     const pdfSec = document.getElementById('section-pdf-files');
     const locSec = document.getElementById('section-location');
     const workerSec = document.getElementById('section-workers');
@@ -733,35 +515,54 @@
     const locationInput = document.getElementById('location');
     const agreeChk = document.getElementById('chk_agree');
     const reqFiles = document.querySelectorAll('.req-file');
+    const reqBankFields = document.querySelectorAll('.req-bank-field');
+    const reqBankFiles = document.querySelectorAll('.req-bank-file');
 
     const receiptNum = document.getElementById('receiptNumber');
     const fixLocation = document.getElementById('fixLocation');
     const storeName = document.getElementById('storeName');
     const fixDetails = document.getElementById('fixDetails');
 
-    // Reset required attributes
+    const reportLocation = document.getElementById('reportLocation');
+    const reportApplicantName = document.getElementById('reportApplicantName');
+
     locationInput.required = false;
     agreeChk.required = false;
     reqFiles.forEach(f => f.required = false);
+    reqBankFields.forEach(f => f.required = false);
+    reqBankFiles.forEach(f => f.required = false);
     receiptNum.required = false;
     fixLocation.required = false;
     storeName.required = false;
     fixDetails.required = false;
+    reportLocation.required = false;
+    reportApplicantName.required = false;
 
     if (type === 'Action修正') {
       actionFixSec.classList.remove('hidden');
+      reportOrderSec.classList.add('hidden');
       pdfSec.classList.add('hidden');
       locSec.classList.add('hidden');
       workerSec.classList.add('hidden');
-
       document.getElementById('worker-list').innerHTML = '';
-
       fixLocation.required = true;
       receiptNum.required = true;
       storeName.required = true;
       fixDetails.required = true;
+    } else if (type === '報告書発注') {
+      actionFixSec.classList.add('hidden');
+      reportOrderSec.classList.remove('hidden');
+      pdfSec.classList.add('hidden');
+      locSec.classList.add('hidden');
+      workerSec.classList.add('hidden');
+      document.getElementById('worker-list').innerHTML = '';
+      reportLocation.required = true;
+      reportApplicantName.required = true;
+      document.getElementById('acReportQty').value = '';
+      document.getElementById('afsReportQty').value = '';
     } else {
       actionFixSec.classList.add('hidden');
+      reportOrderSec.classList.add('hidden');
       workerSec.classList.remove('hidden');
 
       if (type === '新規') {
@@ -769,6 +570,8 @@
         locSec.classList.add('hidden');
         agreeChk.required = true;
         reqFiles.forEach(f => f.required = true);
+        reqBankFields.forEach(f => f.required = true);
+        reqBankFiles.forEach(f => f.required = true);
         document.getElementById('worker-section-title').textContent = 'ACN技術員登録申請書';
       } else if (type === '追加') {
         pdfSec.classList.add('hidden');
@@ -787,15 +590,27 @@
     }
   }
 
-  // Action修正の添付ファイル入力欄を追加
+  function resetSelection() {
+    currentType = null;
+    clearErrors();
+    document.querySelectorAll('input[name="type"]').forEach(radio => radio.checked = false);
+    document.querySelectorAll('.radio-card').forEach(card => card.classList.remove('selected'));
+    document.getElementById('section-action-fix').classList.add('hidden');
+    document.getElementById('section-report-order').classList.add('hidden');
+    document.getElementById('section-pdf-files').classList.add('hidden');
+    document.getElementById('section-location').classList.add('hidden');
+    document.getElementById('section-workers').classList.add('hidden');
+    document.getElementById('btn-submit').classList.add('hidden');
+    document.getElementById('section-menu').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   function addFixFileInput() {
     const container = document.getElementById('fix-file-list');
-    const rows = container.querySelectorAll('.file-input-row');
-    if (rows.length >= MAX_FIX_FILES) {
+    if (container.querySelectorAll('.file-input-row').length >= MAX_FIX_FILES) {
       alert('添付ファイルは最大5個までです。');
       return;
     }
-
     const row = document.createElement('div');
     row.className = 'file-input-row';
     row.innerHTML = `
@@ -803,60 +618,34 @@
       <button type="button" class="btn-remove-file" onclick="removeFixFileInput(this)">削除</button>
     `;
     container.appendChild(row);
-
-    if (container.querySelectorAll('.file-input-row').length >= MAX_FIX_FILES) {
-      document.getElementById('btn-add-fix-file').style.display = 'none';
-    }
   }
 
   function removeFixFileInput(btn) {
     const row = btn.closest('.file-input-row');
-    if (row) {
-      row.remove();
-      const container = document.getElementById('fix-file-list');
-      if (container.querySelectorAll('.file-input-row').length < MAX_FIX_FILES) {
-        document.getElementById('btn-add-fix-file').style.display = 'inline-block';
-      }
-    }
+    if (row) row.remove();
   }
 
   function addWorkerCard() {
     const container = document.getElementById('worker-list');
-    const currentCards = container.querySelectorAll('.worker-card');
-    if (currentCards.length >= MAX_WORKERS) {
+    if (container.querySelectorAll('.worker-card').length >= MAX_WORKERS) {
       alert('最大10名までしか追加できません。');
       return;
     }
 
     const card = document.createElement('div');
     card.className = 'worker-card';
-
     const isDelete = (currentType === '削除');
 
     let html = `
       <button type="button" class="btn-remove" onclick="removeWorkerCard(this)">削除</button>
       <div class="worker-title">作業員</div>
-      <div class="form-group">
-        <label>氏名 <span style="color:red;">*</span></label>
-        <input type="text" class="w-name" required placeholder="山田 太郎">
-      </div>
-      <div class="form-group">
-        <label>氏名(カタカナ) <span style="color:red;">*</span></label>
-        <input type="text" class="w-kana" required placeholder="ヤマダ タロウ">
-      </div>
-      <div class="form-group">
-        <label>携帯電話 <span style="color:red;">*</span></label>
-        <input type="tel" class="w-phone" required placeholder="090-1234-5678">
-      </div>
+      <div class="form-group"><label>氏名 <span style="color:red;">*</span></label><input type="text" class="w-name" required placeholder="山田 太郎"></div>
+      <div class="form-group"><label>氏名(カタカナ) <span style="color:red;">*</span></label><input type="text" class="w-kana" required placeholder="ヤマダ タロウ"></div>
+      <div class="form-group"><label>携帯電話 <span style="color:red;">*</span></label><input type="tel" class="w-phone" required placeholder="090-1234-5678" oninput="convertToHalfWidth(this)"></div>
     `;
 
     if (!isDelete) {
-      html += `
-        <div class="form-group">
-          <label>外出先で受信可能なアドレス(スマホ可) <span style="color:red;">*</span></label>
-          <input type="email" class="w-email" required placeholder="example@domain.com">
-        </div>
-      `;
+      html += `<div class="form-group"><label>外出先で受信可能なアドレス <span style="color:red;">*</span></label><input type="email" class="w-email" required placeholder="example@domain.com" oninput="convertToHalfWidth(this)"></div>`;
     }
 
     html += `
@@ -867,7 +656,6 @@
 
     card.innerHTML = html;
     container.appendChild(card);
-
     updateWorkerCards();
   }
 
@@ -882,175 +670,191 @@
   function updateWorkerCards() {
     const cards = document.querySelectorAll('.worker-card');
     cards.forEach((card, index) => {
-      const title = card.querySelector('.worker-title');
-      const removeBtn = card.querySelector('.btn-remove');
-      
-      title.textContent = `作業員 ${index + 1}`;
-      removeBtn.style.display = (index === 0) ? 'none' : 'block';
+      card.querySelector('.worker-title').textContent = `作業員 ${index + 1}`;
+      card.querySelector('.btn-remove').style.display = (index === 0) ? 'none' : 'block';
+    });
+    document.getElementById('btn-add-worker').style.display = (cards.length >= MAX_WORKERS) ? 'none' : 'block';
+  }
+
+  function clearErrors(formElement) {
+    const target = formElement || document;
+    target.querySelectorAll('.is-invalid-error').forEach(el => el.classList.remove('is-invalid-error'));
+    target.querySelectorAll('.field-error-msg').forEach(msg => msg.remove());
+  }
+
+  function validateForm(formId) {
+    const form = document.getElementById(formId);
+    clearErrors(form);
+
+    let firstInvalid = null;
+    const inputs = form.querySelectorAll('input:not([type="hidden"]), select, textarea');
+
+    inputs.forEach(input => {
+      if (input.closest('.hidden')) return;
+
+      let isInvalid = false;
+
+      if (input.hasAttribute('required')) {
+        if (input.type === 'checkbox') {
+          if (!input.checked) isInvalid = true;
+        } else if (input.type === 'file') {
+          if (!input.files || input.files.length === 0) isInvalid = true;
+        } else {
+          if (!input.value.trim()) isInvalid = true;
+        }
+      }
+
+      if (isInvalid) {
+        if (!firstInvalid) firstInvalid = input;
+        input.classList.add('is-invalid-error');
+
+        const msg = document.createElement('span');
+        msg.className = 'field-error-msg';
+        msg.innerText = '⚠️ この項目は必須です';
+        
+        const parent = input.closest('.form-group') || input.closest('.pdf-box') || input.parentNode;
+        if (!parent.querySelector('.field-error-msg')) {
+          parent.appendChild(msg);
+        }
+      }
     });
 
-    const addBtn = document.getElementById('btn-add-worker');
-    if (addBtn) {
-      addBtn.style.display = (cards.length >= MAX_WORKERS) ? 'none' : 'block';
+    // 報告書発注時の追加チェック（少なくともどちらか一方の数量が選択されているか）
+    if (currentType === '報告書発注') {
+      const acQty = document.getElementById('acReportQty').value;
+      const afsQty = document.getElementById('afsReportQty').value;
+      if (!acQty && !afsQty) {
+        const acSelect = document.getElementById('acReportQty');
+        const afsSelect = document.getElementById('afsReportQty');
+        acSelect.classList.add('is-invalid-error');
+        afsSelect.classList.add('is-invalid-error');
+
+        const parent = acSelect.closest('.sub-section-box');
+        if (!parent.querySelector('.field-error-msg')) {
+          const msg = document.createElement('span');
+          msg.className = 'field-error-msg';
+          msg.innerText = '⚠️ AC報告書またはAFS報告書のいずれかの数量を選択してください';
+          parent.appendChild(msg);
+        }
+
+        if (!firstInvalid) firstInvalid = acSelect;
+      }
     }
+
+    if (firstInvalid) {
+      firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      firstInvalid.focus();
+      return false;
+    }
+    return true;
   }
 
   function fileElementToBase64(inputElement) {
     return new Promise((resolve) => {
-      if (!inputElement || !inputElement.files || !inputElement.files[0]) {
-        resolve(null);
-        return;
-      }
+      if (!inputElement || !inputElement.files || !inputElement.files[0]) { resolve(null); return; }
       const file = inputElement.files[0];
       const reader = new FileReader();
-      reader.onload = function(e) {
-        resolve({
-          name: file.name,
-          type: file.type,
-          base64: e.target.result.split(',')[1]
-        });
-      };
+      reader.onload = (e) => resolve({ name: file.name, type: file.type, base64: e.target.result.split(',')[1] });
       reader.onerror = () => resolve(null);
       reader.readAsDataURL(file);
     });
   }
 
   function fileToBase64(fileInputId) {
-    const input = document.getElementById(fileInputId);
-    return fileElementToBase64(input);
+    return fileElementToBase64(document.getElementById(fileInputId));
   }
 
   function updateProgressBar(barId, textId, percent, statusText) {
-    const bar = document.getElementById(barId);
-    const text = document.getElementById(textId);
-    if (bar) bar.style.width = percent + '%';
-    if (text) text.textContent = `${statusText} (${percent}%)`;
+    document.getElementById(barId).style.width = percent + '%';
+    document.getElementById(textId).textContent = `${statusText} (${percent}%)`;
   }
 
-  // Submission handler
   document.getElementById('gasForm').addEventListener('submit', async function(e) {
     e.preventDefault();
-    
-    const checkedRadio = document.querySelector('input[name="type"]:checked');
-    if (!checkedRadio) {
-      alert('申請種別を選択してください。');
-      return;
-    }
+    if (!currentType) { alert('申請種別を選択してください。'); return; }
 
-    const selectedType = checkedRadio.value;
+    if (!validateForm('gasForm')) return;
+
+    const selectedType = currentType;
     const submitBtn = document.getElementById('btn-submit');
     const statusDiv = document.getElementById('statusMessage');
     const progressBox = document.getElementById('formProgress');
-
-    if (selectedType === 'Action修正') {
-      const fixLocationVal = document.getElementById('fixLocation').value.trim();
-      const receiptNumVal = document.getElementById('receiptNumber').value.trim();
-      const storeNameVal = document.getElementById('storeName').value.trim();
-      const fixDetailsVal = document.getElementById('fixDetails').value.trim();
-
-      // 拠点名 → 受付番号の順番で未入力チェック
-      if (!fixLocationVal || !receiptNumVal || !storeNameVal || !fixDetailsVal) {
-        alert('「拠点名」「受付番号」「店舗名」「修正箇所 / 内容」を入力してください。');
-        return;
-      }
-
-      if (/[^\x20-\x7e]/.test(receiptNumVal)) {
-        alert('「受付番号」は半角で入力してください。');
-        return;
-      }
-    } else if (selectedType === '新規') {
-      const chkAgree = document.getElementById('chk_agree');
-      if (!chkAgree.checked) {
-        alert('規約・重要事項等の同意にチェックを入れてください。');
-        return;
-      }
-      const fileInputs = document.querySelectorAll('.req-file');
-      for (let input of fileInputs) {
-        if (!input.files || input.files.length === 0) {
-          alert('すべての必須PDFファイルを添付してください。');
-          return;
-        }
-      }
-    } else if (selectedType === '追加' || selectedType === '削除') {
-      const locVal = document.getElementById('location').value.trim();
-      if (!locVal) {
-        alert('「拠点名」を入力してください。');
-        return;
-      }
-    }
 
     submitBtn.disabled = true;
     submitBtn.textContent = '送信中...';
     progressBox.classList.remove('hidden');
     statusDiv.textContent = '';
-
-    updateProgressBar('formProgressBar', 'formProgressText', 20, '添付書類を処理中...');
+    updateProgressBar('formProgressBar', 'formProgressText', 20, 'データを処理中...');
 
     let payload = { type: selectedType };
 
     if (selectedType === 'Action修正') {
-      const fixLocation = document.getElementById('fixLocation').value;
-      const receiptNumber = document.getElementById('receiptNumber').value;
-      const storeName = document.getElementById('storeName').value;
-      const fixDetails = document.getElementById('fixDetails').value;
+      payload.fixLocation = document.getElementById('fixLocation').value;
+      payload.receiptNumber = document.getElementById('receiptNumber').value;
+      payload.storeName = document.getElementById('storeName').value;
+      payload.fixDetails = document.getElementById('fixDetails').value;
 
-      // 複数ファイル読み込み
       const fixFileInputs = document.querySelectorAll('.file-action-fix');
-      const filePromises = Array.from(fixFileInputs).map(input => fileElementToBase64(input));
-      const loadedFiles = await Promise.all(filePromises);
-      const fixFiles = loadedFiles.filter(f => f !== null);
+      const loadedFiles = await Promise.all(Array.from(fixFileInputs).map(i => fileElementToBase64(i)));
+      payload.fixFiles = loadedFiles.filter(f => f !== null);
 
-      payload.fixLocation = fixLocation;
-      payload.receiptNumber = receiptNumber;
-      payload.storeName = storeName;
-      payload.fixDetails = fixDetails;
-      payload.fixFiles = fixFiles;
+    } else if (selectedType === '報告書発注') {
+      payload.location = document.getElementById('reportLocation').value;
+      payload.applicantName = document.getElementById('reportApplicantName').value;
+      payload.acReportQty = document.getElementById('acReportQty').value || '0';
+      payload.afsReportQty = document.getElementById('afsReportQty').value || '0';
 
     } else {
-      const locationVal = document.getElementById('location').value;
-      const workers = [];
-      const cards = document.querySelectorAll('.worker-card');
+      payload.location = document.getElementById('location').value;
 
-      cards.forEach(card => {
-        workers.push({
-          name: card.querySelector('.w-name').value,
-          kana: card.querySelector('.w-kana').value,
-          phone: card.querySelector('.w-phone').value,
-          email: card.querySelector('.w-email') ? card.querySelector('.w-email').value : '',
-          carMaker: card.querySelector('.w-carMaker').value,
-          carModel: card.querySelector('.w-carModel').value,
-          carNumber: card.querySelector('.w-carNumber').value
-        });
+      const names = [], kanas = [], phones = [], emails = [], carMakers = [], carModels = [], carNumbers = [];
+      
+      document.querySelectorAll('.worker-card').forEach(card => {
+        names.push(card.querySelector('.w-name').value.trim());
+        kanas.push(card.querySelector('.w-kana').value.trim());
+        phones.push(card.querySelector('.w-phone').value.trim());
+        if (card.querySelector('.w-email')) emails.push(card.querySelector('.w-email').value.trim());
+        carMakers.push(card.querySelector('.w-carMaker').value.trim());
+        carModels.push(card.querySelector('.w-carModel').value.trim());
+        carNumbers.push(card.querySelector('.w-carNumber').value.trim());
       });
 
-      if (workers.length > 0) {
-        submittedApplicantEmail = workers[0].email;
-      }
+      payload.workerName = names.join('\n');
+      payload.workerKana = kanas.join('\n');
+      payload.workerPhone = phones.join('\n');
+      payload.workerEmail = emails.join('\n');
+      payload.workerCarMaker = carMakers.join('\n');
+      payload.workerCarModel = carModels.join('\n');
+      payload.workerCarNumber = carNumbers.join('\n');
 
-      const [fileDoc, fileSecret, fileBank, fileEmail] = await Promise.all([
-        fileToBase64('file_doc'),
-        fileToBase64('file_secret'),
-        fileToBase64('file_bank'),
-        fileToBase64('file_email')
+      submittedApplicantName = names[0] || '';
+      submittedApplicantEmail = emails[0] || '';
+
+      const [fileDoc, fileSecret, fileEmail, fileInvoiceSeal] = await Promise.all([
+        fileToBase64('file_doc'), fileToBase64('file_secret'), fileToBase64('file_email'), fileToBase64('file_invoice_seal')
       ]);
 
-      payload.location = locationVal;
-      payload.workers = workers;
       payload.file_doc = fileDoc;
       payload.file_secret = fileSecret;
-      payload.file_bank = fileBank;
       payload.file_email = fileEmail;
+
+      if (selectedType === '新規') {
+        payload.invoiceCompanyName = document.getElementById('invoiceCompanyName').value;
+        payload.department = document.getElementById('invoiceDeptName').value;
+        payload.postalCode = document.getElementById('invoicePostalCode').value;
+        payload.address = document.getElementById('invoiceAddress').value;
+        payload.invoicePhone = document.getElementById('invoiceTel').value;
+        payload.fax = document.getElementById('invoiceFax').value;
+        payload.file_stamp = fileInvoiceSeal;
+        payload.bankName = document.getElementById('bankName').value;
+        payload.branchName = document.getElementById('branchName').value;
+        payload.accountType = document.getElementById('accountType').value;
+        payload.accountHolder = document.getElementById('accountName').value;
+        payload.accountNumber = document.getElementById('accountNumber').value;
+      }
     }
 
-    updateProgressBar('formProgressBar', 'formProgressText', 50, 'データをサーバーへ送信中...');
-
-    let fakeProgress = 50;
-    const interval = setInterval(() => {
-      if (fakeProgress < 85) {
-        fakeProgress += 5;
-        updateProgressBar('formProgressBar', 'formProgressText', fakeProgress, '送信中...');
-      }
-    }, 400);
+    updateProgressBar('formProgressBar', 'formProgressText', 60, 'データを送信中...');
 
     try {
       const response = await fetch(GAS_URL, {
@@ -1058,16 +862,12 @@
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload)
       });
-
       const data = await response.json();
-      clearInterval(interval);
 
       if (data.result === 'success') {
         updateProgressBar('formProgressBar', 'formProgressText', 100, '送信完了！');
-
         setTimeout(() => {
           document.getElementById('form-container').classList.add('hidden');
-
           if (selectedType === '新規') {
             document.getElementById('section-completion').classList.remove('hidden');
           } else {
@@ -1075,41 +875,36 @@
           }
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }, 500);
-
       } else {
         statusDiv.style.color = 'red';
         statusDiv.textContent = 'エラー: ' + (data.error || '処理に失敗しました');
-        submitBtn.disabled = false;
-        submitBtn.textContent = '送信する';
+        submitBtn.disabled = false; submitBtn.textContent = '送信する';
         progressBox.classList.add('hidden');
       }
     } catch (error) {
-      clearInterval(interval);
       statusDiv.style.color = 'red';
       statusDiv.textContent = '通信エラーが発生しました: ' + error.message;
-      submitBtn.disabled = false;
-      submitBtn.textContent = '送信する';
+      submitBtn.disabled = false; submitBtn.textContent = '送信する';
       progressBox.classList.add('hidden');
     }
   });
 
-  // Schedule form handler
   document.getElementById('scheduleForm').addEventListener('submit', async function(e) {
     e.preventDefault();
-    
+
+    if (!validateForm('scheduleForm')) return;
+
     const schedBtn = document.getElementById('btn-submit-schedule');
     const schedStatus = document.getElementById('scheduleStatus');
     const schedProgressBox = document.getElementById('schedProgress');
 
-    schedBtn.disabled = true;
-    schedBtn.textContent = '登録中...';
-    schedProgressBox.classList.remove('hidden');
-    schedStatus.textContent = '';
-
-    updateProgressBar('schedProgressBar', 'schedProgressText', 30, 'スケジュール内容を準備中...');
+    schedBtn.disabled = true; schedBtn.textContent = '登録中...';
+    schedProgressBox.classList.remove('hidden'); schedStatus.textContent = '';
+    updateProgressBar('schedProgressBar', 'schedProgressText', 50, 'サーバーへ登録中...');
 
     const scheduleData = {
       action: 'save_schedule',
+      applicantName: submittedApplicantName,
       applicantEmail: submittedApplicantEmail,
       pref1: document.getElementById('pref_date_1').value + ' ' + document.getElementById('pref_time_1').value,
       pref2: document.getElementById('pref_date_2').value + ' ' + document.getElementById('pref_time_2').value,
@@ -1117,25 +912,13 @@
       notes: document.getElementById('schedule_notes').value
     };
 
-    updateProgressBar('schedProgressBar', 'schedProgressText', 60, 'サーバーへ登録中...');
-
-    let fakeProgress = 60;
-    const interval = setInterval(() => {
-      if (fakeProgress < 90) {
-        fakeProgress += 10;
-        updateProgressBar('schedProgressBar', 'schedProgressText', fakeProgress, '登録中...');
-      }
-    }, 300);
-
     try {
       const response = await fetch(GAS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(scheduleData)
       });
-
       const data = await response.json();
-      clearInterval(interval);
 
       if (data.result === 'success') {
         updateProgressBar('schedProgressBar', 'schedProgressText', 100, '登録完了！');
@@ -1145,15 +928,12 @@
       } else {
         schedStatus.style.color = 'red';
         schedStatus.textContent = 'エラー: ' + (data.error || '登録に失敗しました');
-        schedBtn.disabled = false;
-        schedBtn.textContent = '希望スケジュールを登録する';
+        schedBtn.disabled = false; schedBtn.textContent = '希望スケジュールを登録する';
       }
     } catch (error) {
-      clearInterval(interval);
       schedStatus.style.color = 'red';
       schedStatus.textContent = '通信エラーが発生しました: ' + error.message;
-      schedBtn.disabled = false;
-      schedBtn.textContent = '希望スケジュールを登録する';
+      schedBtn.disabled = false; schedBtn.textContent = '希望スケジュールを登録する';
     }
   });
 </script>
